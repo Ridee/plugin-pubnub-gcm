@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
+        id="com.jinn.plugin-pubnub-gcm"
+        version="0.1.0">
+
+    <name>PubnubPushNotification</name>
+    <description>Pubnub Push Notification Plugin</description>
+    <license>MIT</license>
+    <keywords>cordova, PubNub, Push</keywords>
+
+    <js-module src="www/pubnub-push-notification.js" name="PubnubPushNotification">
+      <clobbers target="pubnubPushNotification" />
+    </js-module>
+
+    <!-- android -->
+    <platform name="android">
+      <config-file target="res/xml/config.xml" parent="/*">
+        <feature name="PubnubPushNotification">
+          <param name="android-package" value="com.jinn.plugins.PubnubPushNotification"/>
+          </feature>
+      </config-file>
+
+      <!--<source-file src="src/android/libs/android-support-v4.jar" target-dir="libs" framework="true"/>-->
+      <source-file src="src/android/libs/Pubnub-Android-3.7.5.jar" target-dir="libs" framework="true"/>
+      <source-file src="src/android/libs/google-play-services.jar" target-dir="libs" framework="true"/>
+
+      <source-file src="src/android/PubnubPushNotification.java" target-dir="src/com/jinn/plugins" />
+      <source-file src="src/android/MyBroadcastsReceiver.java" target-dir="src/com/jinn/plugins" />
+      <source-file src="src/android/MyGcmListenerService.java" target-dir="src/com/jinn/plugins" />
+      <source-file src="src/android/MainActivity.java" target-dir="src/com/jinn/plugins" />
+      <source-file src="src/android/MyInstanceIDListenerService.java" target-dir="src/com/jinn/plugins" />
+      <source-file src="src/android/RegistrationIntentService.java" target-dir="src/com/jinn/plugins" />
+
+      <config-file target="AndroidManifest.xml" parent="/manifest">
+        <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+        <uses-permission android:name="android.permission.WAKE_LOCK" />
+        <uses-permission android:name="android.permission.VIBRATE"/>
+        <uses-permission android:name="android.permission.INTERNET" />
+        <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+        <permission android:name="com.jinn.plugins.permission.C2D_MESSAGE" android:protectionLevel="signature" />
+        <uses-permission android:name="com.jinn.plugins.permission.C2D_MESSAGE" />
+      </config-file>
+      <config-file target="AndroidManifest.xml" parent="/manifest/application">
+        <activity android:name="com.jinn.plugins.MainActivity" android:exported="true"/>
+        <receiver
+            android:name="com.google.android.gms.gcm.GcmReceiver"
+            android:permission="com.google.android.c2dm.permission.SEND" >
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <category android:name="com.jinn.plugins" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name="com.jinn.plugins.MyBroadcastsReceiver"
+          android:exported="false">
+        </receiver>
+        <service
+            android:name="com.jinn.plugins.MyGcmListenerService"
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+            </intent-filter>
+        </service>
+        <service
+            android:name="com.jinn.plugins.MyInstanceIDListenerService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.android.gms.iid.InstanceID"/>
+            </intent-filter>
+        </service>
+        <service android:name="com.jinn.plugins.RegistrationIntentService" android:exported="false" />
+      </config-file>
+    </platform>
+</plugin>
