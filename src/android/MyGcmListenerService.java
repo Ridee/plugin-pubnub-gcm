@@ -143,7 +143,6 @@ public class MyGcmListenerService extends GcmListenerService {
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
         //NotificationManager notificationManager =
           //      (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
         notificationManager.notify(notifyID, notificationBuilder.build());
         sharedPreferences.edit().putInt(PubnubPushNotification.AMOUNT_OF_MESSAGES, numberOfMessages).apply();
         notificationMessages.add(message.optString("message"));
