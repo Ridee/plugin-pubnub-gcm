@@ -19,11 +19,11 @@ import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.app.NotificationManager;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import com.pubnub.api.*;
-import android.graphics.Bitmap;
 import android.net.Uri;
 
 
@@ -56,7 +56,6 @@ public class PubnubPushNotification extends CordovaPlugin {
     private CallbackContext callback = null;
 
     private String senderId;
-    //private String jsCallback;
     private String channel;
     private String pubKey;
     private String subKey;
@@ -65,9 +64,6 @@ public class PubnubPushNotification extends CordovaPlugin {
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {
         super.initialize(cordova, webView);
         foreground = true;
-        //SharedPreferences sharedPreferences =
-                //PreferenceManager.getDefaultSharedPreferences(this.cordova.getActivity());
-        //jsCallback = sharedPreferences.getString(JS_CALLBACK_KEY, null);
 
         if (mRegistrationBroadcastReceiver != null) {
             LocalBroadcastManager.getInstance(cordova.getActivity()).registerReceiver(mRegistrationBroadcastReceiver,
@@ -94,11 +90,6 @@ public class PubnubPushNotification extends CordovaPlugin {
                     callbackContext.error("You need to provide a Sender ID, please check: https://developers.google.com/cloud-messaging/android/client?configured=true for more information.");
                     return false;
                 }
-                /*jsCallback = args.optJSONObject(0).optString("jsCallback", null);
-                if (jsCallback == null) {
-                    callbackContext.error("Please provide a jsCallback to fully support notifications");
-                    return false;
-                }*/
                 channel = args.optJSONObject(0).optString("channel", null);
                 if (channel == null) {
                     callbackContext.error("Please provide a pubnub channel");
@@ -157,7 +148,14 @@ public class PubnubPushNotification extends CordovaPlugin {
                     Log.d("push-notification", e.toString());
                     return false;
                 }
-            } else {
+            } else if("cancelNotification".equals(action)) {
+                Log.d("push-notification", "CANCELING");
+                NotificationManager notificationManager = (NotificationManager)cordova.getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
+                notificationManager.cancelAll();
+                Log.d("push-notification", "CANCELLED");
+                callback.success("Cancel OK");
+                return true;
+            }else {
                 callbackContext.error("Action not Recognized.");
                 return false;
             }
@@ -218,17 +216,6 @@ public class PubnubPushNotification extends CordovaPlugin {
     @Override
     public Object onMessage(String id, Object data) {
         Log.d("push-notification", "onMessage");
-        /*if (id.equals("onPageFinished")) {
-            //This here is to catch throw the notification once the app has been down.
-            //TODO: Maybe there is a better place to do this ? or another way to do this ?
-            SharedPreferences sharedPreferences =
-                    PreferenceManager.getDefaultSharedPreferences(cordova.getActivity());
-
-            String lastPush = sharedPreferences.getString(LAST_PUSH_KEY, null);
-            if (lastPush != null) {
-                sendPushToJavascript(lastPush);
-            }
-        }*/
         return super.onMessage(id, data);
     }
 
@@ -267,7 +254,6 @@ public class PubnubPushNotification extends CordovaPlugin {
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.d("push-notification", "onReceive");
-            //sendPushToJavascript(intent.getStringExtra("data"));
             try{
                 JSONArray response = new JSONArray();
                 response.put(new JSONObject().put("Type", "PushMessage"));
@@ -285,8 +271,7 @@ public class PubnubPushNotification extends CordovaPlugin {
     private BroadcastReceiver mNotificationDeleteBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d("push-notification", "onReceive DELETEEEEE");
-
+            Log.d("push-notification", "onReceive DELETE");
         }
     };
 
@@ -317,23 +302,6 @@ public class PubnubPushNotification extends CordovaPlugin {
     public static boolean isInForeground() {
       return foreground;
     }
-
-    /*public static Bitmap getLargeImage() {
-        //String icon = options.optString("icon", "icon");
-        Bitmap bmp;
-
-        try{
-            Log.d("push-notification", "getLargeImage");
-            Uri uri = Uri.parse(options.optString("iconUri"));
-            bmp = assets.getIconFromUri(uri);
-        } catch (Exception e){
-            //bmp = assets.getIconFromDrawable(icon);
-            Log.d("push-notification", "Error getLargeImage");
-
-        }
-
-        return bmp;
-    }*/
 
     /**
      * Check the device to make sure it has the Google Play Services APK. If
