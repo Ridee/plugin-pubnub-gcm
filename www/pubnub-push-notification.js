@@ -26,10 +26,10 @@ var pubnubPushNotification = {
       [options]
     );
   },
-  cancelNotification: function () {
+  cancelNotification: function (successCallback, errorCallback) {
     cordova.exec(
-      function(resp){},
-      function(resp){},
+      successCallback,
+      errorCallback,
       "PubnubPushNotification",
       "cancelNotification",
       []
