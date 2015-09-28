@@ -153,6 +153,7 @@ public class PubnubPushNotification extends CordovaPlugin {
                 NotificationManager notificationManager = (NotificationManager)cordova.getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
                 notificationManager.cancelAll();
                 Log.d("push-notification", "CANCELLED");
+                JSONArray response = new JSONArray();
                 response.put(new JSONObject().put("Type", "OK"));
                 PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, response);
                 pluginResult.setKeepCallback(true);
